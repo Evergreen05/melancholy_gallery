@@ -1,0 +1,20 @@
+{% extends "admin/login.html" %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">🌙 忧郁画廊 · 管理后台</a>
+</h1>
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{{ block.super }}
+<script>
+    var usernameField = document.getElementById('id_username');
+    if (usernameField) {
+        usernameField.type = 'email';
+        usernameField.placeholder = '输入邮箱';
+        var label = document.querySelector('label[for="id_username"]');
+        if (label) label.textContent = '邮箱：';
+    }
+</script>

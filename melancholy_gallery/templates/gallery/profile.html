@@ -2,13 +2,6 @@
 {% block title %}{{ profile_user.username }} · 忧郁画廊{% endblock %}
 
 {% block content %}
-<div style="position:relative;">
-{% if is_own %}
-<form method="post" action="{% url 'logout' %}" style="position:absolute;top:0;right:0;z-index:10;">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-ghost btn-sm">登出</button>
-</form>
-{% endif %}
 <div class="profile-header">
     {% if profile_user.profile.avatar %}
         <img src="{{ profile_user.profile.avatar.url }}" alt="" class="profile-avatar">
@@ -40,9 +33,13 @@
                 <div class="stat-label">关注</div>
             </a>
         </div>
-        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;">
             {% if is_own %}
                 <a href="{% url 'edit_profile' %}" class="btn btn-ghost btn-sm">编辑资料</a>
+                <form method="post" action="{% url 'logout' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-ghost btn-sm" style="color:var(--text-dim);">登出</button>
+                </form>
             {% else %}
                 {% if user.is_authenticated %}
                     <form method="post" action="{% url 'toggle_follow' username=profile_user.username %}" style="display:inline;">
@@ -181,7 +178,5 @@
         <p>{% if is_own %}你还没有收藏过视频{% else %}暂无收藏{% endif %}</p>
     </div>
     {% endif %}
-</div>
-</div>
 </div>
 {% endblock %}
