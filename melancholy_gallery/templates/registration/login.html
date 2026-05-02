@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}登录 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <h1>🌙 欢迎回来</h1>
+    <p class="subtitle">在雨夜中重逢</p>
+
+    <div class="auth-card">
+        <form method="post">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div class="msg msg-error" style="margin-bottom:1rem;">
+                邮箱或密码错误
+            </div>
+            {% endif %}
+
+            <div class="form-group">
+                <label for="id_username">邮箱</label>
+                <input type="email" name="username" id="id_username" class="form-input" placeholder="输入邮箱" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="id_password">密码</label>
+                <input type="password" name="password" id="id_password" class="form-input" placeholder="输入密码" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary">登录</button>
+        </form>
+    </div>
+
+    <div class="auth-switch">
+        还没有账号？<a href="{% url 'register' %}">注册</a>
+    </div>
+</div>
+{% endblock %}

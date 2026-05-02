@@ -1,0 +1,71 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}忧郁画廊{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@300;400;600&family=Zen+Maru+Gothic:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <div class="rain-container" id="rain"></div>
+    <div class="sakura-container" id="sakura"></div>
+
+    <nav class="navbar">
+        <div class="nav-inner">
+            <a href="{% url 'home' %}" class="nav-logo">
+                <span class="logo-icon">🌙</span>
+                <span class="logo-text">忧郁画廊</span>
+            </a>
+            <div class="nav-links">
+                <a href="{% url 'home' %}" class="nav-link">首页</a>
+                <a href="{% url 'image_list' %}" class="nav-link">图画馆</a>
+                <a href="{% url 'video_list' %}" class="nav-link">影像馆</a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'upload' %}" class="nav-link">上传图画</a>
+                    <a href="{% url 'video_upload' %}" class="nav-link">上传视频</a>
+                    <a href="{% url 'inbox' %}" class="nav-link">
+                        私信{% if unread_count %} <span class="badge">{{ unread_count }}</span>{% endif %}
+                    </a>
+                    {% if user.is_staff %}
+                        <a href="/admin/" class="nav-link">管理</a>
+                    {% endif %}
+                    <a href="{% url 'profile' %}" class="nav-user">
+                        {% if user.profile.avatar and user.profile.avatar.url %}
+                            <img src="{{ user.profile.avatar.url }}" alt="" class="nav-avatar">
+                        {% endif %}
+                        {{ user.username }}
+                    </a>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link">登录</a>
+                    <a href="{% url 'register' %}" class="nav-link nav-register">注册</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+            <div class="msg msg-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p>🌙 忧郁画廊 · 在孤独中寻找美</p>
+            <p class="footer-sub">雨夜、黄昏、星尘——每一帧都值得被记住</p>
+        </div>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

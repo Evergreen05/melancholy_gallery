@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% block title %}与 {{ other.username }} 的对话 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'inbox' %}" class="detail-back">← 返回私信列表</a>
+
+    <div class="conversation-header">
+        <a href="{% url 'user_profile' username=other.username %}">
+            {% if other.profile.avatar %}
+                <img src="{{ other.profile.avatar.url }}" alt="" class="inbox-avatar">
+            {% else %}
+                <div class="inbox-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;color:var(--bg-deep);">
+                    {{ other.username|first }}
+                </div>
+            {% endif %}
+        </a>
+        <div>
+            <a href="{% url 'user_profile' username=other.username %}" style="color:var(--text-bright);text-decoration:none;font-weight:500;">
+                {{ other.username }}
+            </a>
+        </div>
+    </div>
+
+    <div class="conversation-messages" id="messages">
+        {% for msg in msg_list %}
+        <div class="msg-bubble {% if msg.sender == user %}msg-sent{% else %}msg-received{% endif %}">
+            <p class="msg-text">{{ msg.content|linebreaksbr }}</p>
+            <span class="msg-time">{{ msg.created_at|date:"m月d日 H:i" }}</span>
+        </div>
+        {% endfor %}
+    </div>
+
+    <form method="post" class="comment-form" style="margin-top:1rem;">
+        {% csrf_token %}
+        {{ form.content }}
+        <button type="submit" class="btn btn-primary btn-sm">发送</button>
+    </form>
+</div>
+
+<script>
+    var el = document.getElementById('messages');
+    if (el) el.scrollTop = el.scrollHeight;
+</script>
+{% endblock %}

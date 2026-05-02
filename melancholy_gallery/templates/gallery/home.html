@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>忧 郁 画 廊</h1>
+    <p>在孤独的雨夜里，每一帧画面都是一首未完的诗</p>
+</div>
+
+{% if videos %}
+<div style="margin-bottom:2.5rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <h2 style="font-size:1.2rem;font-weight:400;color:var(--text-bright);">🎬 最新影像</h2>
+        <a href="{% url 'video_list' %}" style="color:var(--primary-light);font-size:0.85rem;text-decoration:none;">查看全部 →</a>
+    </div>
+    <div class="image-grid">
+        {% for vid in videos %}
+        <div class="image-card">
+            <a href="{% url 'video_detail' pk=vid.pk %}">
+                {% if vid.thumbnail %}
+                    <img src="{{ vid.thumbnail.url }}" alt="{{ vid.title }}" class="card-image" loading="lazy">
+                {% else %}
+                    <div class="card-image video-placeholder">
+                        <span>🎬</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="card-title">{{ vid.title }}</div>
+                    {% if vid.description %}
+                        <div class="card-desc">{{ vid.description }}</div>
+                    {% endif %}
+                    <div class="card-meta">
+                        <span>{{ vid.author.username }}</span>
+                        <div class="card-stats">
+                            <span>❤️ {{ vid.like_total }}</span>
+                            <span>💬 {{ vid.comment_total }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if images %}
+<div style="margin-bottom:2.5rem;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;">
+        <h2 style="font-size:1.2rem;font-weight:400;color:var(--text-bright);">🖼️ 最新图画</h2>
+        <a href="{% url 'image_list' %}" style="color:var(--primary-light);font-size:0.85rem;text-decoration:none;">查看全部 →</a>
+    </div>
+    <div class="image-grid">
+        {% for img in images %}
+        <div class="image-card">
+            <a href="{% url 'image_detail' pk=img.pk %}">
+                <img src="{{ img.image.url }}" alt="{{ img.title }}" class="card-image" loading="lazy">
+                <div class="card-body">
+                    <div class="card-title">{{ img.title }}</div>
+                    {% if img.description %}
+                        <div class="card-desc">{{ img.description }}</div>
+                    {% endif %}
+                    <div class="card-meta">
+                        <span>{{ img.author.username }}</span>
+                        <div class="card-stats">
+                            <span>❤️ {{ img.like_total }}</span>
+                            <span>💬 {{ img.comment_total }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% elif not videos %}
+<div class="empty-state">
+    <div class="icon">🌧️</div>
+    <p>还没有内容……这片空白，也是一种忧郁。</p>
+    {% if user.is_authenticated %}
+        <a href="{% url 'upload' %}" class="btn btn-primary" style="margin-top:1rem;">上传第一张</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

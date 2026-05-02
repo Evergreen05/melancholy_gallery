@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }} · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div style="position:relative;">
+{% if is_own %}
+<form method="post" action="{% url 'logout' %}" style="position:absolute;top:0;right:0;z-index:10;">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-ghost btn-sm">登出</button>
+</form>
+{% endif %}
+<div class="profile-header">
+    {% if profile_user.profile.avatar %}
+        <img src="{{ profile_user.profile.avatar.url }}" alt="" class="profile-avatar">
+    {% else %}
+        <div class="profile-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:2rem;color:var(--bg-deep);">
+            {{ profile_user.username|first }}
+        </div>
+    {% endif %}
+    <div class="profile-info">
+        <h2>{{ profile_user.username }}</h2>
+        {% if profile_user.profile.bio %}
+            <p class="profile-bio">{{ profile_user.profile.bio }}</p>
+        {% endif %}
+        <div class="profile-stats">
+            <div class="stat">
+                <div class="stat-num">{{ images|length }}</div>
+                <div class="stat-label">图画</div>
+            </div>
+            <div class="stat">
+                <div class="stat-num">{{ videos|length }}</div>
+                <div class="stat-label">视频</div>
+            </div>
+            <a href="{% url 'followers_list' username=profile_user.username %}" class="stat" style="text-decoration:none;color:inherit;">
+                <div class="stat-num">{{ profile_user.followers.count }}</div>
+                <div class="stat-label">粉丝</div>
+            </a>
+            <a href="{% url 'following_list' username=profile_user.username %}" class="stat" style="text-decoration:none;color:inherit;">
+                <div class="stat-num">{{ profile_user.following.count }}</div>
+                <div class="stat-label">关注</div>
+            </a>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+            {% if is_own %}
+                <a href="{% url 'edit_profile' %}" class="btn btn-ghost btn-sm">编辑资料</a>
+            {% else %}
+                {% if user.is_authenticated %}
+                    <form method="post" action="{% url 'toggle_follow' username=profile_user.username %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn {% if is_following %}btn-ghost{% else %}btn-primary{% endif %} btn-sm">
+                            {% if is_following %}已关注{% else %}关注{% endif %}
+                        </button>
+                    </form>
+                    <a href="{% url 'send_message' username=profile_user.username %}" class="btn btn-ghost btn-sm">私信</a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="profile-tabs">
+    <button class="tab active" data-tab="tab-images">🖼️ 图画</button>
+    <button class="tab" data-tab="tab-videos">🎬 视频</button>
+    <button class="tab" data-tab="tab-favorites">⭐ 图画收藏</button>
+    <button class="tab" data-tab="tab-video-favorites">⭐ 视频收藏</button>
+</div>
+
+<div id="tab-images" class="tab-content active">
+    {% if images %}
+    <div class="image-grid">
+        {% for img in images %}
+        <div class="image-card">
+            <a href="{% url 'image_detail' pk=img.pk %}">
+                <img src="{{ img.image.url }}" alt="{{ img.title }}" class="card-image" loading="lazy">
+                <div class="card-body">
+                    <div class="card-title">{{ img.title }}</div>
+                    <div class="card-meta">
+                        <span>{{ img.created_at|date:"Y.m.d" }}</span>
+                        <div class="card-stats">
+                            <span>❤️ {{ img.like_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">🖼️</div>
+        <p>{% if is_own %}你还没有上传过图画{% else %}暂无图画{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+
+<div id="tab-videos" class="tab-content">
+    {% if videos %}
+    <div class="image-grid">
+        {% for vid in videos %}
+        <div class="image-card">
+            <a href="{% url 'video_detail' pk=vid.pk %}">
+                {% if vid.thumbnail %}
+                    <img src="{{ vid.thumbnail.url }}" alt="{{ vid.title }}" class="card-image" loading="lazy">
+                {% else %}
+                    <div class="card-image video-placeholder">
+                        <span>🎬</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="card-title">{{ vid.title }}</div>
+                    <div class="card-meta">
+                        <span>{{ vid.created_at|date:"Y.m.d" }}</span>
+                        <div class="card-stats">
+                            <span>❤️ {{ vid.like_count }}</span>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">🎬</div>
+        <p>{% if is_own %}你还没有上传过视频{% else %}暂无视频{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+
+<div id="tab-favorites" class="tab-content">
+    {% if favorites %}
+    <div class="image-grid">
+        {% for fav in favorites %}
+        <div class="image-card">
+            <a href="{% url 'image_detail' pk=fav.image.pk %}">
+                <img src="{{ fav.image.image.url }}" alt="{{ fav.image.title }}" class="card-image" loading="lazy">
+                <div class="card-body">
+                    <div class="card-title">{{ fav.image.title }}</div>
+                    <div class="card-meta">
+                        <span>{{ fav.image.author.username }}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">⭐</div>
+        <p>{% if is_own %}你还没有收藏过图画{% else %}暂无收藏{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+
+<div id="tab-video-favorites" class="tab-content">
+    {% if video_favorites %}
+    <div class="image-grid">
+        {% for fav in video_favorites %}
+        <div class="image-card">
+            <a href="{% url 'video_detail' pk=fav.video.pk %}">
+                {% if fav.video.thumbnail %}
+                    <img src="{{ fav.video.thumbnail.url }}" alt="{{ fav.video.title }}" class="card-image" loading="lazy">
+                {% else %}
+                    <div class="card-image video-placeholder">
+                        <span>🎬</span>
+                    </div>
+                {% endif %}
+                <div class="card-body">
+                    <div class="card-title">{{ fav.video.title }}</div>
+                    <div class="card-meta">
+                        <span>{{ fav.video.author.username }}</span>
+                    </div>
+                </div>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">⭐</div>
+        <p>{% if is_own %}你还没有收藏过视频{% else %}暂无收藏{% endif %}</p>
+    </div>
+    {% endif %}
+</div>
+</div>
+</div>
+{% endblock %}

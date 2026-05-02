@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block title %}编辑资料 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="upload-page">
+    <h1>🌙 编辑资料</h1>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="form-group" style="text-align:center;">
+            {% if user.profile.avatar %}
+                <img src="{{ user.profile.avatar.url }}" alt="" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);margin-bottom:1rem;">
+            {% endif %}
+            <label>{{ form.avatar.label }}</label>
+            {{ form.avatar }}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.username.label }}</label>
+            {{ form.username }}
+            {% if form.username.errors %}
+                <div class="form-error">{{ form.username.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.bio.label }}</label>
+            {{ form.bio }}
+            {% if form.bio.errors %}
+                <div class="form-error">{{ form.bio.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            保存
+        </button>
+    </form>
+
+    <div style="text-align:center;margin-top:1rem;">
+        <a href="{% url 'profile' %}" style="color:var(--text-dim);font-size:0.85rem;">← 返回个人中心</a>
+    </div>
+</div>
+{% endblock %}

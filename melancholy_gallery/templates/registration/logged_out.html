@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}已登出 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <h1>🌙 再见</h1>
+    <p class="subtitle">雨还在下，我们还会再见</p>
+    <a href="{% url 'login' %}" class="btn btn-primary" style="margin-top:1rem;">重新登录</a>
+    <br>
+    <a href="{% url 'home' %}" style="color:var(--text-dim);font-size:0.85rem;display:inline-block;margin-top:1rem;">← 返回首页</a>
+</div>
+{% endblock %}

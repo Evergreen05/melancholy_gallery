@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block title %}上传视频 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="upload-page">
+    <h1>🎬 分享你的影像</h1>
+
+    <form method="post" enctype="multipart/form-data" class="upload-form">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="msg msg-error">
+            {% for error in form.non_field_errors %}
+                {{ error }}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label>{{ form.title.label }}</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="form-error">{{ form.title.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.description.label }}</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div class="form-error">{{ form.description.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.video.label }}</label>
+            <div class="upload-drop" onclick="document.getElementById('id_video').click();">
+                <p>🎥 点击选择视频，或拖拽到此处</p>
+                <p style="font-size:0.75rem;margin-top:8px;">支持 MP4 / WebM / OGG / MOV / AVI / MKV，最大 200MB</p>
+            </div>
+            {{ form.video }}
+            {% if form.video.errors %}
+                <div class="form-error">{{ form.video.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>{{ form.thumbnail.label }}</label>
+            {{ form.thumbnail }}
+            {% if form.thumbnail.errors %}
+                <div class="form-error">{{ form.thumbnail.errors.0 }}</div>
+            {% endif %}
+        </div>
+
+        <div class="progress-bar" style="display:none;">
+            <div class="progress-fill"></div>
+            <span class="progress-text">0%</span>
+        </div>
+
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            上传
+        </button>
+    </form>
+</div>
+{% endblock %}

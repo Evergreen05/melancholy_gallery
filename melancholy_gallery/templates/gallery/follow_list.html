@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}{{ profile_user.username }} 的{{ list_type }} · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'user_profile' username=profile_user.username %}" class="detail-back">← 返回 {{ profile_user.username }} 的主页</a>
+
+    <h2 style="font-size:1.3rem;font-weight:400;color:var(--text-bright);margin-bottom:1.5rem;">
+        {{ profile_user.username }} 的{{ list_type }} ({{ users|length }})
+    </h2>
+
+    {% if users %}
+    <div class="follow-list">
+        {% for u in users %}
+        <div class="follow-item">
+            <a href="{% url 'user_profile' username=u.username %}" class="follow-avatar-link">
+                {% if u.profile.avatar %}
+                    <img src="{{ u.profile.avatar.url }}" alt="" class="follow-avatar">
+                {% else %}
+                    <div class="follow-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;color:var(--bg-deep);">
+                        {{ u.username|first }}
+                    </div>
+                {% endif %}
+            </a>
+            <div class="follow-info">
+                <a href="{% url 'user_profile' username=u.username %}" class="follow-name">{{ u.username }}</a>
+                {% if u.profile.bio %}
+                    <p class="follow-bio">{{ u.profile.bio }}</p>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>暂无{{ list_type }}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

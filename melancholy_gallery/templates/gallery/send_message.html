@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block title %}给 {{ other.username }} 发私信 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="upload-page">
+    <h1>💬 给 {{ other.username }} 发私信</h1>
+
+    <div style="text-align:center;margin-bottom:1.5rem;">
+        <a href="{% url 'user_profile' username=other.username %}">
+            {% if other.profile.avatar %}
+                <img src="{{ other.profile.avatar.url }}" alt="" style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--primary);">
+            {% else %}
+                <div style="width:60px;height:60px;border-radius:50%;background:var(--primary);display:inline-flex;align-items:center;justify-content:center;font-size:1.5rem;color:var(--bg-deep);">
+                    {{ other.username|first }}
+                </div>
+            {% endif %}
+        </a>
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-top:0.5rem;">{{ other.username }}</p>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            {{ form.content }}
+            {% if form.content.errors %}
+                <div class="form-error">{{ form.content.errors.0 }}</div>
+            {% endif %}
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">
+            发送
+        </button>
+    </form>
+
+    <div style="text-align:center;margin-top:1rem;">
+        <a href="{% url 'user_profile' username=other.username %}" style="color:var(--text-dim);font-size:0.85rem;">← 返回 {{ other.username }} 的主页</a>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}私信 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <h2 style="font-size:1.3rem;font-weight:400;color:var(--text-bright);margin-bottom:1.5rem;">💬 私信</h2>
+
+    {% if conversations %}
+    <div class="inbox-list">
+        {% for conv in conversations %}
+        <a href="{% url 'conversation' username=conv.user.username %}" class="inbox-item {% if conv.unread %}inbox-unread{% endif %}">
+            {% if conv.user.profile.avatar %}
+                <img src="{{ conv.user.profile.avatar.url }}" alt="" class="inbox-avatar">
+            {% else %}
+                <div class="inbox-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:1rem;color:var(--bg-deep);">
+                    {{ conv.user.username|first }}
+                </div>
+            {% endif %}
+            <div class="inbox-body">
+                <div class="inbox-header">
+                    <span class="inbox-name">{{ conv.user.username }}</span>
+                    <span class="inbox-time">{{ conv.last_time|date:"m月d日 H:i" }}</span>
+                </div>
+                <p class="inbox-preview">{{ conv.last_msg|truncatechars:50 }}</p>
+            </div>
+            {% if conv.unread %}
+                <span class="inbox-dot"></span>
+            {% endif %}
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">💬</div>
+        <p>还没有私信</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

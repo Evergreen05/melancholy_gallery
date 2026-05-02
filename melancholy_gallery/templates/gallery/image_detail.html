@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% block title %}{{ image.title }} · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <a href="{% url 'home' %}" class="detail-back">← 返回画廊</a>
+
+    <div class="detail-image-wrap">
+        <img src="{{ image.image.url }}" alt="{{ image.title }}" class="detail-image">
+    </div>
+
+    <div class="detail-actions">
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'toggle_like' pk=image.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn {% if is_liked %}liked{% endif %}" data-action="like" data-url="{% url 'toggle_like' pk=image.pk %}">
+                ❤️ <span class="count">{{ image.like_count }}</span>
+            </button>
+        </form>
+        <form method="post" action="{% url 'toggle_favorite' pk=image.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="action-btn {% if is_favorited %}favorited{% endif %}" data-action="favorite" data-url="{% url 'toggle_favorite' pk=image.pk %}">
+                ⭐ <span class="count">{{ image.favorites.count }}</span>
+            </button>
+        </form>
+        {% if image.author == user or user.is_staff %}
+        <form method="post" action="{% url 'delete_image' pk=image.pk %}" style="display:inline;"
+              onsubmit="return confirm('确定删除这张图画吗？');">
+            {% csrf_token %}
+            <button type="submit" class="action-btn btn-danger btn-sm">🗑️ 删除</button>
+        </form>
+        {% endif %}
+        {% else %}
+        <span class="action-btn">❤️ {{ image.like_count }}</span>
+        <span class="action-btn">⭐ {{ image.favorites.count }}</span>
+        {% endif %}
+    </div>
+
+    <div class="detail-info">
+        <h1 class="detail-title">{{ image.title }}</h1>
+        {% if image.description %}
+            <p class="detail-desc">{{ image.description|linebreaksbr }}</p>
+        {% endif %}
+        <div class="detail-author">
+            由 <a href="{% url 'user_profile' username=image.author.username %}">{{ image.author.username }}</a>
+            上传于 {{ image.created_at|date:"Y年m月d日 H:i" }}
+        </div>
+    </div>
+
+    <div class="comments-section">
+        <h2 class="comments-title">💬 评论 ({{ comments|length }})</h2>
+
+        {% if user.is_authenticated %}
+        <form method="post" action="{% url 'add_comment' pk=image.pk %}" class="comment-form">
+            {% csrf_token %}
+            {{ comment_form.content }}
+            <button type="submit" class="btn btn-primary btn-sm">发送</button>
+        </form>
+        {% else %}
+        <p style="color:var(--text-dim);font-size:0.85rem;margin-bottom:1rem;">
+            <a href="{% url 'login' %}" style="color:var(--accent);">登录</a> 后可以评论
+        </p>
+        {% endif %}
+
+        <div class="comment-list">
+            {% for comment in comments %}
+            <div class="comment-item">
+                {% if comment.author.profile.avatar %}
+                    <img src="{{ comment.author.profile.avatar.url }}" alt="" class="comment-avatar">
+                {% else %}
+                    <div class="comment-avatar" style="background:var(--primary);display:flex;align-items:center;justify-content:center;font-size:0.8rem;">
+                        {{ comment.author.username|first }}
+                    </div>
+                {% endif %}
+                <div class="comment-body">
+                    <div class="comment-header">
+                        <span class="comment-author">
+                            <a href="{% url 'user_profile' username=comment.author.username %}" style="color:inherit;text-decoration:none;">
+                                {{ comment.author.username }}
+                            </a>
+                        </span>
+                        <span class="comment-time">{{ comment.created_at|date:"m月d日 H:i" }}</span>
+                    </div>
+                    <p class="comment-text">{{ comment.content|linebreaksbr }}</p>
+                    {% if comment.author == user or user.is_staff %}
+                    <form method="post" action="{% url 'delete_comment' pk=comment.pk %}" style="margin-top:4px;"
+                          onsubmit="return confirm('删除这条评论？');">
+                        {% csrf_token %}
+                        <button type="submit" style="background:none;border:none;color:var(--text-dim);font-size:0.75rem;cursor:pointer;">
+                            删除
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="padding:2rem;">
+                <p>还没有评论……留下你的第一句话吧。</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

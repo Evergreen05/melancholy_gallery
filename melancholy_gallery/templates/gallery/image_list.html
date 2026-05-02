@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}图画馆 · 忧郁画廊{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>图 画 馆</h1>
+    <p>在静止的画面里，凝视那些无法诉说的心事</p>
+    <div class="hero-search">
+        <form method="get" action="{% url 'image_list' %}">
+            <input type="text" name="q" value="{{ query }}" placeholder="搜索图画...">
+        </form>
+    </div>
+</div>
+
+{% if images %}
+<div class="image-grid">
+    {% for img in images %}
+    <div class="image-card">
+        <a href="{% url 'image_detail' pk=img.pk %}">
+            <img src="{{ img.image.url }}" alt="{{ img.title }}" class="card-image" loading="lazy">
+            <div class="card-body">
+                <div class="card-title">{{ img.title }}</div>
+                {% if img.description %}
+                    <div class="card-desc">{{ img.description }}</div>
+                {% endif %}
+                <div class="card-meta">
+                    <span>{{ img.author.username }}</span>
+                    <div class="card-stats">
+                        <span>❤️ {{ img.like_total }}</span>
+                        <span>💬 {{ img.comment_total }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+    <div class="icon">🖼️</div>
+    <p>还没有图画……这片空白，也是一种忧郁。</p>
+    {% if user.is_authenticated %}
+        <a href="{% url 'upload' %}" class="btn btn-primary" style="margin-top:1rem;">上传第一张</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}
